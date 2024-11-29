@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <title>Add New User</title>
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+  <style>
+    /* Background and Base Styles */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #2c5f2d, #a78a5f);
+      font-family: Arial, sans-serif;
+    }
+
+    /* Centered Form Container */
+    .user-form-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Title Styles */
+    .user-form-container h2 {
+      font-size: 2rem;
+      color: #2c5f2d;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Button Styles */
+    .user-form-container button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #b5651d;
+      border: none;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .user-form-container button:hover {
+      background-color: #8a4d15;
+    }
+
+    /* Form Field Styles */
+    .user-form-container .form-control,
+    .user-form-container .form-select {
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+<div class="user-form-container">
+  <h2>Add New User</h2>
+  <form th:action="@{/admin/users}" method="post">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input
+              type="text"
+              id="password"
+              name="password"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="firstName" class="form-label">First Name</label>
+      <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="lastName" class="form-label">Last Name</label>
+      <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="phoneNumber" class="form-label">Phone Number</label>
+      <input
+              type="text"
+              id="phoneNumber"
+              name="phoneNumber"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="role" class="form-label">Role</label>
+      <select id="role" name="role" class="form-select" required>
+        <option value="" disabled selected>Select a role</option>
+        <option value="ROLE_USER">Customer</option>
+        <option value="ROLE_SELLER">Seller</option>
+        <option value="ROLE_ADMIN">Admin</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seller Page</title>
+</head>
+<body>
+<h1>Welcome to the farmer Page</h1>
+<div>
+  <p th:text="${message}"></p>
+</div>
+
+</div>
+
+<p><a th:href="@{/logout}">Logout</a></p>
+
+<div id="user-notifications">
+  <h3>Notifications <span id="notification-count"></span></h3>
+  <div id="user-notification-list">
+    <!-- Notifications will be appended here by JavaScript -->
+  </div>
+  <script>
+    async function fetchUserNotifications() {
+        const response = await fetch('/notifications/user/unread');
+        const notifications = await response.json();
+        const notificationListDiv = document.getElementById('user-notification-list');
+
+        notificationListDiv.innerHTML = ''; // Clear previous notifications
+        notifications.forEach(notification => {
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'notification-item';
+            notificationItem.innerHTML = `
+                <strong>${notification.title}</strong>
+                <p>${notification.message}</p>
+            `;
+            notificationListDiv.appendChild(notificationItem);
+        });
+
+        // Update unread notification count
+        document.getElementById('notification-count').innerText = notifications.length;
+
+        // Mark notifications as read after displaying
+        markAllNotificationsAsRead();
+    }
+
+    async function markAllNotificationsAsRead() {
+        await fetch('/notifications/user/mark-all-as-read', { method: 'PUT' });
+    }
+
+    // Fetch notifications on page load
+    window.onload = fetchUserNotifications;
+  </script>
+</body>
+</html>

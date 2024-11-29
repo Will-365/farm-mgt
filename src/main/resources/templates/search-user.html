@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Search User</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Background and Base Styles */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #2c5f2d, #a78a5f);
+      font-family: Arial, sans-serif;
+    }
+
+    /* Centered Form Container */
+    .search-form-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    /* Title Styles */
+    .search-form-container h2 {
+      font-size: 2rem;
+      color: #2c5f2d;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Button Styles */
+    .search-form-container button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #b5651d;
+      border: none;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-form-container button:hover {
+      background-color: #8a4d15;
+    }
+
+    /* Form Field Styles */
+    .search-form-container .form-control {
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+<div class="search-form-container">
+  <h2>Search User</h2>
+  <form th:action="@{/admin/search/results}" method="get">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" id="username" name="username" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" id="email" name="email" class="form-control">
+    </div>
+    <button type="submit">Search</button>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${pageTitle}">FarmEase - Smart Farm Management</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet"
+    />
+    <style>
+        /* Base Styles */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+          overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+          background-color: rgba(44, 95, 45, 0.95);
+          padding: 1rem;
+          position: fixed;
+          width: 100%;
+          top: 0;
+          z-index: 1000;
+          transition: background-color 0.3s;
+        }
+
+        header.scrolled {
+          background-color: rgba(44, 95, 45, 1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+        }
+
+        .auth-links {
+          display: flex;
+          gap: 1rem;
+        }
+
+        .auth-links a {
+          color: white;
+          background-color: #b5651d; /* Brown-yellow color */
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 1.5rem;
+          border-radius: 5px;
+        }
+
+        .auth-links a:hover {
+          background-color: #8a4d15; /* Darker shade for hover */
+        }
+
+        .nav-center {
+          display: flex;
+          gap: 2rem;
+        }
+
+        .nav-center a {
+          color: white;
+          text-decoration: none;
+          font-weight: 500;
+        }
+
+        /* Slideshow Styles */
+        .slideshow-container {
+          margin-top: 4rem;
+          position: relative;
+          height: 600px;
+          overflow: hidden;
+        }
+
+        .slide {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          background-size: cover;
+          background-position: center;
+          transition: opacity 1s ease-in-out;
+        }
+
+        .slide.active {
+          opacity: 1;
+        }
+
+        .slide-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 50px;
+          height: 50px;
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10;
+        }
+
+        .slide-arrow.prev {
+          left: 2rem;
+        }
+
+        .slide-arrow.next {
+          right: 2rem;
+        }
+
+        .slide-arrow i {
+          color: white;
+          font-size: 1.5rem;
+        }
+
+        .hero-content {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          text-align: center;
+          color: white;
+          width: 80%;
+        }
+
+        .hero-content h1 {
+          font-size: 3.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+          font-size: 1.2rem;
+          margin-bottom: 2rem;
+        }
+
+        .cta-button {
+          padding: 1rem 2.5rem;
+          background-color: #f1ab12; /* Brown-yellow color */
+          color: white;
+          text-decoration: none;
+          border-radius: 50px;
+          font-weight: 600;
+        }
+
+        .cta-button:hover {
+          background-color: #b5651d; /* Darker shade for hover */
+        }
+
+        /* Features Section */
+        .features-section {
+          padding: 4rem 2rem;
+          text-align: center;
+        }
+
+        .features-section h2 {
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
+          color: #2c5f2d;
+        }
+
+        .features-list {
+          display: flex;
+          gap: 2rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .feature-item {
+          flex: 1 1 300px;
+          padding: 2rem;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          background-color: #f9f9f9;
+          text-align: left;
+        }
+
+        .feature-item i {
+          font-size: 2rem;
+          color: #2c5f2d;
+        }
+
+        .feature-item h3 {
+          margin-top: 1rem;
+          font-size: 1.5rem;
+        }
+
+        .feature-item p {
+          margin-top: 0.5rem;
+          color: #555;
+        }
+
+        /* About Section */
+        .about-section {
+          padding: 4rem 2rem;
+          background-color: #f4f4f4;
+          text-align: center;
+        }
+
+        .about-section h2 {
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
+          color: #2c5f2d;
+        }
+
+        .about-content {
+          max-width: 800px;
+          margin: 0 auto;
+          font-size: 1.2rem;
+          color: #555;
+        }
+
+        /* Footer Section */
+        footer {
+          padding: 2rem;
+          background-color: #2c5f2d;
+          color: white;
+          text-align: center;
+        }
+
+        footer p {
+          margin-top: 1rem;
+          font-size: 1rem;
+        }
+        .logo-m {
+          height: 100%;
+        }
+        .logo-m img {
+          width: 150px;
+          height: 100%;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header>
+    <nav>
+        <div class="logo-m">
+            <img src="/img/logo3.png" />
+        </div>
+        <div class="auth-links">
+            <a href="login.html">Login</a>
+            <a href="register.html">Sign Up</a>
+        </div>
+        <div class="nav-center">
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+</header>
+
+<!-- Slideshow Container -->
+<div class="slideshow-container">
+    <div
+            class="slide active"
+            style="background-image: url('img/background1.jpg')"
+    ></div>
+    <div class="slide" style="background-image: url('/img/background2.jpg')"></div>
+    <div class="slide" style="background-image: url('/img/background3.jpg')"></div>
+
+    <div class="slide-arrow prev"><i class="fas fa-chevron-left"></i></div>
+    <div class="slide-arrow next"><i class="fas fa-chevron-right"></i></div>
+
+    <div class="hero-content">
+        <h1>Smart Farm Management Solutions</h1>
+        <p>
+            Streamline your farming operations with our innovative management
+            system
+        </p>
+        <a href="login.html" class="cta-button">Get Started</a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <h2>Features</h2>
+    <div class="features-list">
+        <div class="feature-item">
+            <i class="fas fa-seedling"></i>
+            <h3>Efficient Crop Management</h3>
+            <p>
+                Track crop growth stages, monitor soil health, and optimize yield
+                with our advanced tools.
+            </p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-chart-line"></i>
+            <h3>Real-Time Data Analysis</h3>
+            <p>
+                Get insights on production data and weather forecasts to make
+                informed decisions.
+            </p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-water"></i>
+            <h3>Water Management</h3>
+            <p>
+                Manage irrigation schedules effectively to save water and reduce
+                costs.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section">
+    <h2>About Us</h2>
+    <div class="about-content">
+        <p>
+            FarmEase is dedicated to revolutionizing farm management. Our platform
+            combines the latest in agricultural technology and data-driven
+            insights to empower farmers around the world. With FarmEase, managing
+            your farm becomes a seamless and efficient experience.
+        </p>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer>
+    <p>&copy; 2024 FarmEase. All rights reserved.</p>
+</footer>
+
+<!-- JavaScript for Slideshow -->
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const prevArrow = document.querySelector(".slide-arrow.prev");
+    const nextArrow = document.querySelector(".slide-arrow.next");
+
+    function showSlide(index) {
+      slides[currentSlide].classList.remove("active");
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add("active");
+    }
+
+    function autoSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    let autoSlideInterval = setInterval(autoSlide, 5000);
+
+    prevArrow.addEventListener("click", () => {
+      clearInterval(autoSlideInterval);
+      showSlide(currentSlide - 1);
+      autoSlideInterval = setInterval(autoSlide, 5000);
+    });
+
+    nextArrow.addEventListener("click", () => {
+      clearInterval(autoSlideInterval);
+      showSlide(currentSlide + 1);
+      autoSlideInterval = setInterval(autoSlide, 5000);
+    });
+
+    window.addEventListener("scroll", () => {
+      document
+        .querySelector("header")
+        .classList.toggle("scrolled", window.scrollY > 50);
+    });
+</script>
+</body>
+</html>
