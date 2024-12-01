@@ -1,9 +1,10 @@
 package rw.minagri.farmmanagement.controller;
 
-
-
-
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,6 +13,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import rw.minagri.farmmanagement.model.Role;
 import rw.minagri.farmmanagement.model.User;
 import rw.minagri.farmmanagement.service.UserService;
@@ -22,70 +29,70 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
-
+@RestController
+@RequestMapping("/admin")
 public class AdminUserController {
 
     private final UserService userService;
-
     public AdminUserController(UserService userService) {
-        this.userService = userService;
+        this.userService = userService;}
+
+
+    @CrossOrigin(origins = "http://localhost:5173") // Allow only this origin
+    @GetMapping("/users")
+    public ResponseEntity<Map<String, Object>> getUsers(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        // Use the pageable method to get a page of users with sorting
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Page<User> userPage = userService.getAllUsers(pageable);
+
+        // Build the response
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", userPage.getContent());
+        response.put("currentPage", pageNo);
+        response.put("totalPages", userPage.getTotalPages());
+        response.put("totalUsers", userPage.getTotalElements());
+        response.put("sortBy", sortBy);
+
+        return ResponseEntity.ok(response);
     }
-//    @GetMapping("/admin")
-//    public String showAdminDashboard(Model model) {
-//        List<User> recentUsers = userService.getRecentUsers();
-//        model.addAttribute("recentUsers", recentUsers);
-//        return "admin-dashboard"; // The template where recent users are displayed
+
+
+
+//    @GetMapping("/users/add")
+//    public String showAddUserForm(Model model) {
+//        model.addAttribute("user", new User()); // Create a new User object
+//        return "add-user"; // Return the add user template
 //    }
 
-
-    @GetMapping("/admin/add")
-    public String showAddUserForm(Model model) {
-        model.addAttribute("user", new User()); // Create a new User object
-        return "add-user"; // Return the add user template
-    }
-
-    @PostMapping("/admin/users")
+    @PostMapping("/users")
     public String addUser (@ModelAttribute User user) {
         userService.registerUser (user); // Save the user using your service
-        return "redirect:/admin"; // Redirect to the admin dashboard after saving
+        return "Successfully registered user"; // Redirect to the user management page after saving
     }
 
-    @PostMapping("/admin/users/delete/{id}")
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/users/delete/{id}")
     public String deleteUser (@PathVariable Long id) {
         userService.deleteUser (id); // Call the service to delete the user
-        return "redirect:/admin"; // Redirect to the admin dashboard after deletion
+        return "Successfully"; // Redirect to the user management page after deletion
     }
 
-    @GetMapping("/admin/users/edit/{id}")
-    public String showEditUserForm(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(id); // Fetch the user by ID
-        model.addAttribute("user", user); // Add the user to the model
-        return "edit-user"; // Return the edit user template
-    }
 
-    @PostMapping("/admin/users/update")
-    public String updateUser (@ModelAttribute User user) {
-        userService.updateUser (user); // Call the service to update the user
-        return "redirect:/admin"; // Redirect to the admin dashboard after updating
-    }
 
-    @GetMapping("/admin/search")
-    public String showSearchForm() {
-        return "search-user"; // Return the search user template
-    }
-
-    @GetMapping("/admin/search/results")
-    public String searchUsers(@RequestParam(required = false) String username,
-                              @RequestParam(required = false) String email,
-                              Model model) {
+    @GetMapping("/search/results")
+    public List<User> searchUsers(@RequestParam(required = false) String username,
+                                  @RequestParam(required = false) String email
+    ) {
         List<User> users = userService.searchUsers(username, email); // Call the service to search for users
-        model.addAttribute("users", users); // Add the list of users to the model
-        return "user-list"; // Return the template that displays the list of users
+
+        return users; // Return the template that displays the list of users
     }
 
-
-    @GetMapping("/admin/download/users")
+    @GetMapping("/download/users")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> downloadUsers() throws IOException {
         List<User> users = userService.getAllUsers(); // Fetch all users from the service
@@ -108,38 +115,23 @@ public class AdminUserController {
 
         // Set the content type and attachment header
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.csv");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment ;filename=users.csv");
 
         return ResponseEntity.ok()
-                .headers(headers)
+                .contentType(MediaType.TEXT_PLAIN)
                 .contentLength(resource.contentLength())
-                .contentType(MediaType.parseMediaType("text/csv"))
+                .headers(headers)
                 .body(resource);
     }
 
 
 
-    @GetMapping("/admin/upload")
-    public String showUploadPage() {
-        return "upload"; // Return the combined upload page template
-    }
-
-
-
-
-    // Handle GET requests for the user upload endpoint
-    @GetMapping("/admin/upload/users")
-    public String showUserUploadForm(Model model) {
-        model.addAttribute("userMessage", "Please use the form to upload user data.");
-        return "upload"; // Display the upload page with a message
-    }
 
     // Handle POST requests for user upload
-    @PostMapping("/admin/upload/users")
-    public String uploadUsers(@RequestParam("file") MultipartFile file, Model model) {
+    @PostMapping("/upload/users")
+    public String uploadUsers(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            model.addAttribute("userMessage", "Please select a file to upload.");
-            return "upload";
+            return "Please select a file to upload.";
         }
 
         try {
@@ -156,22 +148,26 @@ public class AdminUserController {
                 user.setLastName(data[2]);
                 user.setEmail(data[3]);
                 user.setPhoneNumber(data[4]);
-                user.setProfilePicture(data[5]);
-                user.setRole(Role.valueOf(data[6]));
+//                user.setProfilePicture(data[5]);
+                user.setRole(Role.valueOf(data[5]));
                 userList.add(user);
             }
 
             userService.saveAll(userList);
-            model.addAttribute("userMessage", "User file uploaded successfully!");
-            return "redirect:/admin";
+
+            return "User file uploaded successfully!";
         } catch (IOException | IllegalArgumentException e) {
-            model.addAttribute("userMessage", "Failed to upload user file: " + e.getMessage());
+
+            return e.getMessage();
         }
 
-        return "upload";
+
     }
 
-    @GetMapping("/admin/user-role-stats")
+
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @GetMapping("/user-role-stats")
     @ResponseBody
     public Map<String, Integer> getUserRoleStatistics() {
         List<User> users = userService.getAllUsers(); // Fetch all users from the service
@@ -179,10 +175,40 @@ public class AdminUserController {
 
         // Count users per role
         for (User  user : users) {
-            String role = user.getRole().name(); // Assuming getRole() returns a Role enum
-            roleStats.put(role, roleStats.getOrDefault(role, 0) + 1);
+            if (user.getRole() != null){
+                String role = user.getRole().name();
+                roleStats.put(role, roleStats.getOrDefault(role, 0) +1);
+            }else {
+                roleStats.put("no roles", roleStats.getOrDefault("no role",0) +1);
+            }
         }
 
         return roleStats; // Return the statistics as a JSON response
     }
+
+
+
+
+
+    @PutMapping("/users/update/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        try {
+            // Call the service method to update the user
+            User updatedUser = userService.updateUser(id, user);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/total-users")
+    public ResponseEntity<Long> getTotalUsers() {
+        Long totalUsers = userService.countTotalUsers();
+        return ResponseEntity.ok(totalUsers);
+    }
+
+
+
 }
+
